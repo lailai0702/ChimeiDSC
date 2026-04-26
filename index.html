@@ -39,7 +39,7 @@ button{cursor:pointer;font-family:inherit}
   object-fit:contain;
   flex-shrink:0;
 }
-.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--primary-lt),var(--primary));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--primary-lt),var(--primary));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0; color: white; box-shadow: 0 2px 8px rgba(90,61,154,0.3);}
 .logo-text{font-family:'Noto Serif TC',serif;font-size:16px;font-weight:700;color:var(--text)}
 .logo-sub{font-size:10.5px;color:var(--text-muted)}
 .hdr-r{display:flex;align-items:center;gap:9px;flex-shrink:0}
@@ -58,7 +58,7 @@ button{cursor:pointer;font-family:inherit}
 .nav-ic{font-size:17px;flex-shrink:0;width:24px;text-align:center}
 .nav-new{margin-left:auto;background:#1a5ea8;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px}
 .sb-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150}
-.mc{flex:1;overflow-y:auto;height:calc(100vh - var(--header-h))}
+.mc{flex:1;overflow-y:auto;height:calc(100vh - var(--header-h)); scroll-behavior: smooth;}
 
 /* ── pages ── */
 .page{display:none}.page.on{display:block}
@@ -124,22 +124,119 @@ button{cursor:pointer;font-family:inherit}
 .b-n{background:#d0eaff;color:#1a5ea8}
 .b-r{background:#fee2e2;color:#991b1b}
 
-/* ── 時程大表 ── */
-.stw{overflow-x:auto;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:24px}
-.st{width:100%;border-collapse:collapse;background:var(--bg-card);font-size:12px;min-width:960px}
-.st .th0 td{background:var(--primary-dk);color:#fff;font-weight:700;font-size:11.5px;text-align:center;padding:8px 6px;border:1px solid rgba(255,255,255,.2)}
-.st .th1 td{background:var(--primary);color:#fff;font-size:11px;text-align:center;padding:6px 5px;border:1px solid rgba(255,255,255,.15);white-space:nowrap}
-.st tbody tr:hover td{background:var(--bg-mist)}
-.st tbody tr:nth-child(even) td{background:rgba(90,61,154,.025)}
-.st td{padding:8px 10px;border:1px solid var(--border);vertical-align:middle;font-size:12px;color:var(--text)}
-.st .dn{font-weight:700;color:var(--primary);white-space:nowrap;font-size:12.5px;min-width:130px}
-.st .ctr{text-align:center}
-.st .mut{color:var(--text-muted);text-align:center;font-size:11.5px}
-.st .done-c{background:rgba(26,122,94,.09)}
-.st .act-c{background:rgba(90,61,154,.08)}
-.st .pre-c{background:rgba(192,130,42,.07)}
-.st .ny{color:#bbb;text-align:center;font-style:italic;font-size:11px}
-.st .sr td{background:var(--bg-mist);font-weight:700;color:var(--primary-dk);font-size:12px;padding:7px 10px;border-top:2px solid var(--border)}
+/* ── 時程大表 (整合版 - 支援上下左右捲動與雙凍結) ── */
+.stw {
+  overflow: auto; /* 啟用上下與左右的滾動條 */
+  max-height: 520px; /* 設定最大高度，讓內容超過時產生垂直捲軸 */
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  position: relative;
+}
+.st {
+  width: 100%;
+  border-collapse: separate; /* 使用 separate 以避免凍結列邊框消失 */
+  border-spacing: 0;
+  background: var(--bg-card);
+  font-size: 12px;
+  min-width: 960px;
+}
+.st td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  vertical-align: middle;
+  font-size: 12px;
+  color: var(--text);
+  background: var(--bg-card);
+}
+.st tr td:last-child {
+  border-right: none;
+}
+
+/* 凍結最上方表頭 (Sticky Header) */
+.st thead {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.st .th0 td {
+  background: var(--primary-dk);
+  color: #fff;
+  font-weight: 700;
+  font-size: 11.5px;
+  text-align: center;
+  padding: 8px 6px;
+  border-bottom: 1px solid rgba(255,255,255,.2);
+  border-right: 1px solid rgba(255,255,255,.2);
+  background-clip: padding-box;
+}
+.st .th1 td {
+  background: var(--primary);
+  color: #fff;
+  font-size: 11px;
+  text-align: center;
+  padding: 6px 5px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid rgba(255,255,255,.15);
+  white-space: nowrap;
+  background-clip: padding-box;
+}
+
+/* 凍結最左側欄位 (Sticky Column) */
+.st .th0 td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 40; /* 確保表頭最左上角維持在最上層 */
+  border-right: 1px solid rgba(255,255,255,.2);
+}
+.st .dn {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.06);
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+  font-size: 12.5px;
+  background-clip: padding-box;
+}
+
+/* 內部列樣式 */
+.st tbody tr:nth-child(even) td { background: rgba(90,61,154,.015); }
+.st tbody tr:hover td { background: var(--bg-mist); }
+.st tbody tr:nth-child(even) .dn { background: #fbf9ff; }
+.st tbody tr:hover .dn { background: var(--bg-mist); }
+
+.st .ctr { text-align: center; }
+.st .mut { color: var(--text-muted); text-align: center; font-size: 11.5px; }
+.st .done-c { background: rgba(26,122,94,.09) !important; }
+.st .act-c { background: rgba(90,61,154,.08) !important; }
+.st .pre-c { background: rgba(192,130,42,.07) !important; }
+.st .ny { color: #bbb; text-align: center; font-style: italic; font-size: 11px; }
+
+/* 分類標題列 */
+.st .sr td {
+  background: var(--bg-mist);
+  font-weight: 700;
+  color: var(--primary-dk);
+  font-size: 12px;
+  padding: 7px 10px;
+  border-top: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  left: 0;
+  z-index: 5;
+}
+
+/* 自訂捲軸樣式，讓拖曳拉條常駐且明顯 (同時支援垂直與水平) */
+.stw::-webkit-scrollbar { width: 12px; height: 12px; }
+.stw::-webkit-scrollbar-track { background: var(--bg-mist); border-radius: var(--radius-sm); }
+.stw::-webkit-scrollbar-thumb { background: #c5b4e3; border-radius: 10px; border: 2px solid var(--bg-mist); }
+.stw::-webkit-scrollbar-thumb:hover { background: var(--primary-lt); }
+.stw::-webkit-scrollbar-corner { background: var(--bg-mist); }
 
 /* timeline */
 .tg{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px}
@@ -224,26 +321,6 @@ button{cursor:pointer;font-family:inherit}
 .csbn{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:700;color:var(--primary)}
 .csbl{font-size:11px;color:var(--text-muted);margin-top:2px}
 
-/* progress */
-.pr{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.pr-l{font-size:12.5px;color:var(--text);min-width:136px}
-.pr-t{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden}
-.pr-f{height:100%;border-radius:4px;transition:width .5s}
-.pr-p{font-size:11px;font-weight:700;color:var(--primary);min-width:70px;text-align:right;white-space:nowrap}
-
-/* quick */
-.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:11px;margin-bottom:24px}
-.qc{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:17px 14px;text-align:center;cursor:pointer;transition:all .2s;display:block}
-.qc:hover{border-color:var(--primary-lt);box-shadow:var(--shadow-lg);transform:translateY(-2px)}
-.qc-i{font-size:25px;margin-bottom:7px}
-.qc-t{font-size:13px;font-weight:700;color:var(--primary);margin-bottom:2px}
-.qc-s{font-size:11.5px;color:var(--text-muted)}
-
-/* legend */
-.leg{display:flex;flex-wrap:wrap;gap:14px;padding:13px 17px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:18px}
-.legi{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)}
-.legdot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-
 /* footer */
 .ft{text-align:center;padding:14px 24px;font-size:11.5px;color:var(--text-muted);border-top:1px solid var(--border);background:var(--bg-card);margin-top:32px}
 
@@ -271,7 +348,7 @@ button{cursor:pointer;font-family:inherit}
   <div class="hdr-l">
     <button class="ham" onclick="toggleSB()">☰</button>
      <div class="logo">
-       <img src="images/chimei_logoblue.png" alt="奇美醫院 Logo" class="hospital-logo">
+       <div class="logo-icon">🏥</div>
       <div>
         <div class="logo-text">奇美醫院疾病照護品質認證</div>
         <div class="logo-sub">奇美醫療財團法人奇美醫院</div>
@@ -286,15 +363,12 @@ button{cursor:pointer;font-family:inherit}
   <nav class="sidebar" id="sb">
     <div class="sb-inner">
       <div class="sb-label">主要功能</div>
-      <button class="nav on" onclick="go('dash',this)"><span class="nav-ic">🏠</span>首頁</button>
-      <button class="nav" onclick="go('updates',this)"><span class="nav-ic">📢</span>115年醫策會修訂<span class="nav-new">新</span></button>
-      <div class="sb-label">認證條文</div>
-      <button class="nav" onclick="go('clauses',this)"><span class="nav-ic">📜</span>39項條文佐證文件</button>
-      <div class="sb-label">認證管理</div>
-      <button class="nav" onclick="go('schedule',this)"><span class="nav-ic">📅</span>認證時程總覽</button>
-      <button class="nav" onclick="go('apply',this)"><span class="nav-ic">📋</span>申請資格查詢</button>
-      <div class="sb-label">持續運作</div>
-      <button class="nav" onclick="go('ops',this)"><span class="nav-ic">🔄</span>持續運作績效</button>
+      <button class="nav on" onclick="go('dash',this)"><span class="nav-ic">🏠</span>首頁-本院認證現況</button>
+      <button class="nav" onclick="go('schedule',this)"><span class="nav-ic">📅</span>團隊認證時程總覽</button>
+      <button class="nav" onclick="go('clauses',this)"><span class="nav-ic">📜</span>認證基準與佐證文件</button>
+      <button class="nav" onclick="go('ops',this)"><span class="nav-ic">🔄</span>每年持續運作績效</button>
+      <button class="nav" onclick="go('updates',this)"><span class="nav-ic">📢</span>醫策會認證作業辦法</button>
+      <button class="nav" onclick="go('apply',this)"><span class="nav-ic">📋</span>申請資格與申報項目</button>
     </div>
   </nav>
 
@@ -303,9 +377,7 @@ button{cursor:pointer;font-family:inherit}
     <!-- ═══ 首頁 ═══ -->
     <div id="page-dash" class="page on">
       <div class="hero">
-        <h2>認證現況總覽</h2>
-        <p>更新日期：115年04月20日</p>
-
+        <h2>本院認證現況</h2>
       </div>
       <div class="ct">
 
@@ -342,36 +414,15 @@ button{cursor:pointer;font-family:inherit}
           <div class="ic dim anim"><div><h4>急性腎臟病照護</h4><p>待醫策會公告</p></div></div>
         </div>
 
-        <!-- 4. 快速入口 -->
-        <h2 class="sec">⚡ 快速入口</h2>
-        <div class="qa">
-          <div class="qc anim" onclick="go('updates',document.querySelectorAll('.nav')[1])"><div class="qc-i">📢</div><div class="qc-t">115年醫策會修訂重點</div><div class="qc-s">115年醫策會修訂</div></div>
-          <div class="qc anim" onclick="go('clauses',document.querySelectorAll('.nav')[2])"><div class="qc-i">📜</div><div class="qc-t">39項條文佐證</div><div class="qc-s">搜尋各條文文件</div></div>
-          <div class="qc anim" onclick="go('schedule',document.querySelectorAll('.nav')[3])"><div class="qc-i">📅</div><div class="qc-t">認證時程總覽</div><div class="qc-s">完整時程大表</div></div>
-          <div class="qc anim" onclick="go('apply',document.querySelectorAll('.nav')[4])"><div class="qc-i">📋</div><div class="qc-t">申請資格查詢</div><div class="qc-s">各疾病別門檻</div></div>
-          <div class="qc anim" onclick="go('ops',document.querySelectorAll('.nav')[5])"><div class="qc-i">🔄</div><div class="qc-t">持續運作績效</div><div class="qc-s">六大查檢面向</div></div>
-        </div>
-
       </div>
       <div class="ft">奇美醫院疾病照護品質認證網頁　｜品質管理部維護｜115.04.20更新</div>
     </div>
 
     <!-- ═══ 115年醫策會修訂重點 ═══ -->
     <div id="page-updates" class="page">
-      <div class="hero"><h2>📢 115年醫策會修訂重點</h2><p>醫策會公告 115年1月起修訂疾病認證作業辦法，共 6 大修訂重點</p></div>
+      <div class="hero"><h2>📢 醫策會認證作業辦法</h2><p>醫策會公告 115年1月起修訂疾病認證作業辦法，共 6 大修訂重點</p></div>
       <div class="ct">
-        <div class="nc anim">
-          <h3>本次修訂 6 大重點（115年1月生效）</h3>
-          <ul class="nl">
-            <li>冠狀動脈疾病申請資格：成人冠狀動脈繞道手術調整為 <strong>35 例</strong>。</li>
-            <li>心衰竭申請資格新增：申請時須具備冠狀動脈疾病或急性心肌梗塞照護品質認證，合格效期至少 <strong>12 個月</strong>，且實地訪視時仍須於效期內。</li>
-            <li>頭頸癌、乳癌、肺癌、結直腸癌、小兒髖關節發育不良：癌症診療品質認證及合作機構契約，於實地訪視時皆須仍於合格效期或合約效期內。</li>
-            <li>新增 <strong>實地複查機制</strong> 及費用說明，並 <strong>刪除「有條件通過」</strong> 之認證結果。</li>
-            <li>連續申請 4 次（含以上）效期皆為 3 年且未中斷者，第 4 次起通過給予效期 <strong>4 年</strong>，並享申請費、認證費及行政處理費優惠。</li>
-            <li>申報資料新增「<strong>2.2.8 高危險群病人之照護標準作業規範</strong>」及「<strong>2.2.9 高風險醫療照護行為之標準作業規範</strong>」兩項。</li>
-          </ul>
-        </div>
-        <h2 class="sec">📋 認證作業辦法規則</h2>
+        <h2 class="sec">📋 認證作業辦法</h2>
         <div class="nc acc anim">
           <h3>申請階段與實訪時序</h3>
           <ul class="nl">
@@ -381,10 +432,23 @@ button{cursor:pointer;font-family:inherit}
             <li><strong>再認證申請：</strong>於效期日半年前提出；<strong>再認證實訪：</strong>於效期日 3 個月前完成</li>
           </ul>
         </div>
-        <h2 class="sec">🆕 115年新增條文</h2>
+        
+        <h2 class="sec">📢 115年1月修訂6大重點</h2>
+        <div class="nc anim">
+          <ul class="nl">
+            <li>冠狀動脈疾病申請資格：成人冠狀動脈繞道手術調整為 <strong>35 例</strong>。</li>
+            <li>心衰竭申請資格新增：申請時須具備冠狀動脈疾病或急性心肌梗塞照護品質認證，合格效期至少 <strong>12 個月</strong>，且實地訪視時仍須於效期內。</li>
+            <li>頭頸癌、乳癌、肺癌、結直腸癌、小兒髖關節發育不良：癌症診療品質認證及合作機構契約，於實地訪視時皆須仍於合格效期或合約效期內。</li>
+            <li>新增 <strong>實地複查機制</strong> 及費用說明，並 <strong>刪除「有條件通過」</strong> 之認證結果。</li>
+            <li>連續申請 4 次（含以上）效期皆為 3 年且未中斷者，第 4 次起通過給予效期 <strong>4 年</strong>，並享申請費、認證費及行政處理費優惠。</li>
+            <li>申報資料新增「<strong>2.2.8 高危險群病人之照護標準作業規範</strong>」及「<strong>2.2.9 高風險醫療照護行為之標準作業規範</strong>」兩項。</li>
+          </ul>
+        </div>
+        
+        <h2 class="sec">🆕 115年起新增條文申報資料</h2>
         <div class="tw anim"><table class="dt"><thead><tr><th>條文編號</th><th>條文名稱</th><th>修訂類型</th><th>說明</th></tr></thead><tbody>
-          <tr><td><span class="b b-n">2.2.8 新增</span></td><td>高危險群病人之照護標準作業規範</td><td>新增條文</td><td>著重病人本身的內在風險識別與預防（跌倒、壓瘡、感染等）</td></tr>
-          <tr><td><span class="b b-n">2.2.9 新增</span></td><td>高風險醫療照護行為之標準作業規範</td><td>新增條文</td><td>著重操作外在風險（手術、侵入性處置、透析、藥物安全）</td></tr>
+          <tr><td><span class="b b-n">2.2.8</span></td><td>高危險群病人之照護標準作業規範</td><td>須申報SOP文件</td><td>著重病人本身的內在風險識別與預防（跌倒、壓瘡、感染等）</td></tr>
+          <tr><td><span class="b b-n">2.2.9</span></td><td>高風險醫療照護行為之標準作業規範</td><td>須申報SOP文件</td><td>著重操作外在風險（手術、侵入性處置、透析、藥物安全）</td></tr>
           <tr><td>冠狀動脈</td><td>繞道手術資格門檻</td><td>修訂資格</td><td>調整為 35 例</td></tr>
           <tr><td>心衰竭</td><td>前置認證要求</td><td>新增資格</td><td>申請時心血管認證效期須剩餘至少 12 個月</td></tr>
         </tbody></table></div>
@@ -395,7 +459,7 @@ button{cursor:pointer;font-family:inherit}
     <!-- ═══ 39項條文 ═══ -->
     <div id="page-clauses" class="page">
       <div class="hero">
-        <h2>📜 39項認證條文佐證文件</h2>
+        <h2>📜 認證基準與佐證文件</h2>
         <p>113.01版疾病認證條文基準，共三章 39 項條文</p>
         <div class="chips">
           <span class="chip">第一章：13項 團隊運作與管理</span>
@@ -458,8 +522,8 @@ button{cursor:pointer;font-family:inherit}
             <div class="ccard" data-ch="ch2" data-t="2.2.5 病人家屬參與 決策 知情同意"><div class="ccH" onclick="tgC(this.parentElement)"><span class="cnum">2.2.5</span><span class="ctitle">病人及家屬參與疾病照護之過程及決策</span><span class="ctog">＋</span></div><div class="cbody"><div class="cdl">📎 佐證文件</div><div class="cdi">病人及家屬參與照護決策之機制文件</div><div class="cdi">知情同意相關紀錄</div></div></div>
             <div class="ccard" data-ch="ch2" data-t="2.2.6 衛教資料 指導 手冊 病人教育"><div class="ccH" onclick="tgC(this.parentElement)"><span class="cnum">2.2.6</span><span class="ctitle">提供衛教資料與指導</span><span class="ctog">＋</span></div><div class="cbody"><div class="cdl">📎 佐證文件</div><div class="cdi">疾病別衛教資料（手冊、單張、衛教紀錄單）</div><div class="cdi">衛教執行紀錄</div></div></div>
             <div class="ccard" data-ch="ch2" data-t="2.2.7 出院計畫 返家 轉介 追蹤"><div class="ccH" onclick="tgC(this.parentElement)"><span class="cnum">2.2.7</span><span class="ctitle">病人出院計畫</span><span class="ctog">＋</span></div><div class="cbody"><div class="cdl">📎 佐證文件</div><div class="cdi">出院計畫作業流程文件</div><div class="cdi">轉介機制及追蹤紀錄</div></div></div>
-            <div class="ccard" data-ch="ch2" data-t="2.2.8 高危險群病人照護 標準作業規範 115年新增 跌倒 壓瘡 感染"><div class="ccH" onclick="tgC(this.parentElement)"><span class="cnum cnum-n">2.2.8 🆕</span><span class="ctitle">高危險群病人之照護標準作業規範</span><span class="ctog">＋</span></div><div class="cbody"><div class="cdl">📎 佐證文件</div><div class="cdi">高危險群病人照護標準作業規範（含定義）</div><div class="cnote"><strong>📌 115年新增：</strong>控制照護過程中的「內在病人風險」，如跌倒、壓瘡、感染等高危因子，著重病人本身狀況的風險識別與預防。</div></div></div>
-            <div class="ccard" data-ch="ch2" data-t="2.2.9 高風險醫療照護行為 標準作業規範 115年新增 手術 透析 藥物 侵入性處置"><div class="ccH" onclick="tgC(this.parentElement)"><span class="cnum cnum-n">2.2.9 🆕</span><span class="ctitle">高風險醫療照護行為之標準作業規範</span><span class="ctog">＋</span></div><div class="cbody"><div class="cdl">📎 佐證文件</div><div class="cdi">高風險醫療照護行為之標準作業規範（含定義）</div><div class="cnote"><strong>📌 115年新增：</strong>控制「操作的外在風險」，如手術、侵入性處置、透析、藥物安全，著重操作行為本身的標準化管理。</div></div></div>
+            <div class="ccard" data-ch="ch2" data-t="2.2.8 高危險群病人照護 標準作業規範 115年新增 跌倒 壓瘡 感染"><div class="ccH" onclick="tgC(this.parentElement)"><span class="cnum cnum-n">2.2.8</span><span class="ctitle">高危險群病人之照護標準作業規範</span><span class="ctog">＋</span></div><div class="cbody"><div class="cdl">📎 佐證文件</div><div class="cdi">高危險群病人照護標準作業規範（含定義）</div><div class="cnote"><strong>📌 115年新增：</strong>控制照護過程中的「內在病人風險」，如跌倒、壓瘡、感染等高危因子，著重病人本身狀況的風險識別與預防。</div></div></div>
+            <div class="ccard" data-ch="ch2" data-t="2.2.9 高風險醫療照護行為 標準作業規範 115年新增 手術 透析 藥物 侵入性處置"><div class="ccH" onclick="tgC(this.parentElement)"><span class="cnum cnum-n">2.2.9</span><span class="ctitle">高風險醫療照護行為之標準作業規範</span><span class="ctog">＋</span></div><div class="cbody"><div class="cdl">📎 佐證文件</div><div class="cdi">高風險醫療照護行為之標準作業規範（含定義）</div><div class="cnote"><strong>📌 115年新增：</strong>控制「操作的外風險」，如手術、侵入性處置、透析、藥物安全，著重操作行為本身的標準化管理。</div></div></div>
             <div class="ccard" data-ch="ch2" data-t="2.2.10 手術 處置 前中後 照護標準作業規範"><div class="ccH" onclick="tgC(this.parentElement)"><span class="cnum">2.2.10</span><span class="ctitle">手術／處置前、中、後之照護標準作業規範</span><span class="ctog">＋</span></div><div class="cbody"><div class="cdl">📎 佐證文件</div><div class="cdi">手術／處置標準作業規範及相關記錄</div></div></div>
             <div class="ccard" data-ch="ch2" data-t="2.2.11 檢查 檢驗 標準作業 異常值 危急值 危險值"><div class="ccH" onclick="tgC(this.parentElement)"><span class="cnum">2.2.11</span><span class="ctitle">檢查／檢驗前、中、後之標準作業程序</span><span class="ctog">＋</span></div><div class="cbody"><div class="cdl">📎 佐證文件</div><div class="cdi">檢查／檢驗標準作業程序</div><div class="cdi">異常值／危急值／危險值作業與通報機制</div></div></div>
             <div class="ccard" data-ch="ch2" data-t="2.2.12 用藥管理 高警訊 管制藥 自備藥"><div class="ccH" onclick="tgC(this.parentElement)"><span class="cnum">2.2.12</span><span class="ctitle">用藥管理</span><span class="ctog">＋</span></div><div class="cbody"><div class="cdl">📎 佐證文件</div><div class="cdi">藥物治療標準作業程序及相關記錄（高警訊／管制藥／自備藥）</div></div></div>
@@ -497,7 +561,7 @@ button{cursor:pointer;font-family:inherit}
         <h2 class="sec" style="margin-top:26px">📊 39項條文章節分布</h2>
         <div class="tw anim"><table class="dt"><thead><tr><th>章節</th><th>條文範圍</th><th>項數</th><th>主要內容</th></tr></thead><tbody>
           <tr><td><strong>第一章</strong> 團隊運作與管理</td><td>1.1.1–1.4.2</td><td><span class="b b-p">13項</span></td><td>團隊發展、人員管理、病人安全、風險評估</td></tr>
-          <tr><td><strong>第二章</strong> 專業的臨床照護</td><td>2.1.1–2.3.2</td><td><span class="b b-u">16項</span></td><td>病人規範、照護作業流程（含 2.2.8/2.2.9 新增）、紀錄品質</td></tr>
+          <tr><td><strong>第二章</strong> 專業的臨床照護</td><td>2.1.1–2.3.2</td><td><span class="b b-u">16項</span></td><td>病人規範、照護作業流程（含 2.2.8/2.2.9 ）、紀錄品質</td></tr>
           <tr><td><strong>第三章</strong> 品質提升及成果</td><td>3.1.1–3.3.5</td><td><span class="b b-g">10項</span></td><td>品質監測、警訊事件通報、品質成效</td></tr>
           <tr><td colspan="2"><strong>合計</strong></td><td><span class="b b-a">39項</span></td><td>113.01版基準（115.04.20更新）</td></tr>
         </tbody></table></div>
@@ -508,29 +572,28 @@ button{cursor:pointer;font-family:inherit}
     <!-- ═══ 認證時程 ═══ -->
     <div id="page-schedule" class="page">
       <div class="hero">
-        <h2>📅 認證時程總覽</h2>
+        <h2>📅 團隊認證時程總覽</h2>
         <p>奇美醫院疾病照護品質認證準備作業時程表｜更新日期：115年04月20日</p>
-
       </div>
       <div class="ct">
-        <div class="leg anim">
-          <div class="legi"><div class="legdot" style="background:rgba(26,122,94,.2);border:1.5px solid #1a7a5e"></div>已完成實訪（效期確認）</div>
-          <div class="legi"><div class="legdot" style="background:#ddd4f0;border:1px solid #5a3d9a"></div>再認證進行中</div>
-          <div class="legi"><div class="legdot" style="background:#d0eaff;border:1px solid #1a5ea8"></div>首次申請已提出</div>
-          <div class="legi"><div class="legdot" style="background:#d4f0e4;border:1px solid #1a7a5e"></div>首次申請規劃中</div>
-          <div class="legi"><div class="legdot" style="background:#f5f5f5;border:1px solid #ccc"></div>尚未啟動</div>
-        </div>
 
         <h2 class="sec">📋 完整認證時程大表（115.04.20更新）</h2>
+        
+        <!-- 單一整合表格容器 (支援垂直與水平捲動) -->
         <div class="stw anim">
-          <table class="st">
+          <table class="st" style="table-layout: fixed; min-width: 960px;">
+            <colgroup>
+              <col style="width:14%; min-width:130px"><col style="width:7.5%; min-width:70px"><col style="width:7.5%; min-width:70px"><col style="width:9.5%; min-width:90px">
+              <col style="width:7.5%; min-width:70px"><col style="width:7.5%; min-width:70px"><col style="width:9.5%; min-width:90px"><col style="width:7.5%; min-width:70px">
+              <col style="width:7.5%; min-width:70px"><col style="width:7.3%; min-width:70px"><col style="width:7.3%; min-width:70px"><col style="width:7.4%; min-width:70px">
+            </colgroup>
             <thead>
               <tr class="th0">
-                <td rowspan="2" style="min-width:135px">疾病照護團隊</td>
-                <td colspan="3" style="text-align:center">首次認證</td>
-                <td colspan="3" style="text-align:center">第二次認證</td>
-                <td colspan="2" style="text-align:center">第三次認證</td>
-                <td colspan="3" style="text-align:center">認證通過改善進度追蹤</td>
+                <td rowspan="2">疾病照護團隊</td>
+                <td colspan="3" class="ctr">首次認證</td>
+                <td colspan="3" class="ctr">第二次認證</td>
+                <td colspan="2" class="ctr">第三次認證</td>
+                <td colspan="3" class="ctr">認證通過改善進度追蹤</td>
               </tr>
               <tr class="th1">
                 <td>提出申請</td><td>實地訪視</td><td>認證通過效期</td>
@@ -540,6 +603,7 @@ button{cursor:pointer;font-family:inherit}
               </tr>
             </thead>
             <tbody>
+              <!-- 再認證疾病別 -->
               <tr class="sr"><td colspan="12">🔄 再認證疾病別（9項）— 目前均在效期內</td></tr>
               <tr><td class="dn">1. 腦中風照護</td><td class="mut">108年6月</td><td class="ctr done-c">109/01/16</td><td class="mut">109/02–112/03</td><td class="mut">111年12月</td><td class="ctr done-c">112/07/24</td><td class="ctr" style="color:var(--success);font-weight:700">112/10–<strong>115/09/30</strong></td><td class="ctr"><span class="b b-p">114年9月</span></td><td class="ctr act-c"><strong>115/05/22</strong></td><td class="mut">112/12/31</td><td class="mut">113/12/31</td><td class="mut">114/12/31</td></tr>
               <tr><td class="dn">2. 創傷性腦損傷</td><td class="mut">108年6月</td><td class="ctr done-c">109/02/21</td><td class="mut">109/03–112/03</td><td class="mut">111年12月</td><td class="ctr done-c">112/08/18</td><td class="ctr" style="color:var(--success);font-weight:700">112/10–<strong>115/09/30</strong></td><td class="ctr"><span class="b b-p">114年9月</span></td><td class="ctr act-c"><strong>115/05/08</strong></td><td class="mut">112/12/31</td><td class="mut">113/12/31</td><td class="mut">114/12/31</td></tr>
@@ -551,6 +615,7 @@ button{cursor:pointer;font-family:inherit}
               <tr><td class="dn">8. 冠狀動脈疾病</td><td class="mut">109年6月</td><td class="ctr done-c">110/04/29</td><td class="mut">110/07–113/06</td><td class="mut">112年3月</td><td class="ctr done-c">112/11/03</td><td class="ctr" style="color:var(--success);font-weight:700">113/07–<strong>116/06/30</strong></td><td class="ctr"><span class="b b-g">115年9月</span></td><td class="ctr mut">116/03（預）</td><td class="mut">113/06/30</td><td class="mut">114/06/30</td><td class="mut">115/06/30</td></tr>
               <tr><td class="dn">9. 慢性阻塞性肺病</td><td class="mut">109年6月</td><td class="ctr done-c">110/11/19</td><td class="mut">111/01–113/12</td><td class="mut">113年3月</td><td class="ctr done-c">113/10/18</td><td class="ctr" style="color:var(--success);font-weight:700">114/01–<strong>116/12/31</strong></td><td class="ctr"><span class="b b-g">116年3月</span></td><td class="ctr mut">116/09（預）</td><td class="mut">114/03/31</td><td class="mut">115/03/31</td><td class="mut">116/03/31</td></tr>
 
+              <!-- 首次申請疾病別 -->
               <tr class="sr"><td colspan="12">🆕 首次申請疾病別（5項）</td></tr>
               <tr><td class="dn">10. 急性心肌梗塞</td><td class="ny" colspan="11">—（尚無申請紀錄）</td></tr>
               <tr><td class="dn">11. 乳癌照護</td><td class="ctr"><span class="b b-n">114年3月</span></td><td class="ctr done-c"><strong>114/12/03 ✅</strong></td><td class="ctr" style="color:var(--success);font-weight:700"><strong>115/04–118/03/31</strong></td><td class="mut">117年3月（預）</td><td class="mut">—</td><td class="mut">—</td><td class="mut" colspan="2">—</td><td class="mut">115/06/30</td><td class="mut">116/06/30</td><td class="mut">117/06/30</td></tr>
@@ -558,7 +623,8 @@ button{cursor:pointer;font-family:inherit}
               <tr><td class="dn">13. 氣喘照護</td><td class="ctr"><span class="b b-g">115年9月</span></td><td class="ctr pre-c">116年（預）</td><td class="mut">待確認</td><td class="mut" colspan="9">—</td></tr>
               <tr><td class="dn">14. 失智症照護</td><td class="ctr"><span class="b b-g">115年9月</span></td><td class="ctr pre-c">116年（預）</td><td class="mut">待確認</td><td class="mut" colspan="9">—</td></tr>
               <tr><td class="dn">15. 小兒髖關節發育不良</td><td class="ctr"><span class="b b-g">116年3月</span></td><td class="ctr mut">116年（預）</td><td class="mut">待確認</td><td class="mut" colspan="9">—</td></tr>
-
+              
+              <!-- 尚未啟動疾病 -->
               <tr class="sr"><td colspan="12">⏳ 尚未啟動（4項）</td></tr>
               <tr><td class="dn">16. 肺癌照護</td><td class="ny" colspan="11">尚未啟動</td></tr>
               <tr><td class="dn">17. 結直腸癌照護</td><td class="ny" colspan="11">尚未啟動</td></tr>
@@ -597,7 +663,7 @@ button{cursor:pointer;font-family:inherit}
 
     <!-- ═══ 申請資格 ═══ -->
     <div id="page-apply" class="page">
-      <div class="hero"><h2>📋 申請資格查詢</h2><p>點選各疾病別展開詳細申請資格與申報填報要求</p></div>
+      <div class="hero"><h2>📋 申請資格與申報項目</h2><p>點選各疾病別展開詳細申請資格與申報填報要求</p></div>
       <div class="ct">
 
         <div class="cs anim" onclick="tgCS(this)">
@@ -677,7 +743,6 @@ button{cursor:pointer;font-family:inherit}
           <div class="cb">
             <div class="cr"><div class="crl">申請資格</div><div class="crc"><ul><li>癌症診療品質認證合格效期內之機構</li><li>乳癌確認診斷及治療醫院</li><li>近三年 Class1/Class2 新收案個案人數合計至少 <strong>300 名</strong></li></ul></div></div>
             <div class="cr"><div class="crl">申報填報項目</div><div class="crc">近三年新收案個案人數；癌症診療品質認證合格證明；乳癌確認診斷及治療醫院之證明</div></div>
-            <div class="cr"><div class="crl">認證效期</div><div class="crc" style="color:var(--success);font-weight:700">115/04/01–118/03/31</div></div>
           </div>
         </div>
 
@@ -686,7 +751,6 @@ button{cursor:pointer;font-family:inherit}
           <div class="cb">
             <div class="cr"><div class="crl">申請資格</div><div class="crc"><ul><li>癌症診療品質認證合格效期內之機構</li><li>近三年 Class1/Class2 個案人數合計至少 <strong>300 名</strong></li><li>近三年 Class1/Class2 新收案個案人數合計至少 <strong>150 名</strong></li></ul></div></div>
             <div class="cr"><div class="crl">申報填報項目</div><div class="crc">近三年 Class1/Class2 個案人數及新收案個案人數；癌症診療品質認證合格證明（效期內）</div></div>
-            <div class="cr"><div class="crl">時程</div><div class="crc">114年9月提出申請，115/06/09 預計實地訪視</div></div>
           </div>
         </div>
 
@@ -695,7 +759,6 @@ button{cursor:pointer;font-family:inherit}
           <div class="cb">
             <div class="cr"><div class="crl">申請資格</div><div class="crc">照護團隊成立後至少須納入 <strong>120 名</strong>病人，應含門診、急診及住院病人</div></div>
             <div class="cr"><div class="crl">申報填報項目</div><div class="crc">門診、急診、住院病人收案數各別填報</div></div>
-            <div class="cr"><div class="crl">預計時程</div><div class="crc">115年9月提出申請，116年（預）實地訪視</div></div>
           </div>
         </div>
 
@@ -704,7 +767,6 @@ button{cursor:pointer;font-family:inherit}
           <div class="cb">
             <div class="cr"><div class="crl">申請資格</div><div class="crc">至少須個案管理 <strong>300 名</strong>失智症病人（含血管性、阿茲海默氏、額顳葉、路易氏體、輕型認知障礙、帕金森氏失智症等）</div></div>
             <div class="cr"><div class="crl">申報填報項目</div><div class="crc">申請前一年度個案管理人數 + 各 ICD-10-CM 代碼（F01.50、F01.51、F03.9、G30、G31 系列等）個別案例數</div></div>
-            <div class="cr"><div class="crl">預計時程</div><div class="crc">115年9月提出申請，116年（預）實地訪視</div></div>
           </div>
         </div>
 
@@ -712,7 +774,6 @@ button{cursor:pointer;font-family:inherit}
           <div class="ch2"><h4>小兒髖關節發育不良照護</h4><span style="margin-left:8px;color:var(--primary-lt)">▾</span></div>
           <div class="cb">
             <div class="cr"><div class="crl">申請資格</div><div class="crc">須具備癌症診療品質認證及合作機構契約（於實地訪視時仍須於合格效期或合約效期內）</div></div>
-            <div class="cr"><div class="crl">預計時程</div><div class="crc">116年3月提出申請，116年（預）實地訪視</div></div>
           </div>
         </div>
 
@@ -755,15 +816,13 @@ button{cursor:pointer;font-family:inherit}
           </div>
         </div>
 
-
       </div>
       <div class="ft">奇美醫院疾病照護品質認證網頁　｜品質管理部維護｜115.04.20更新</div>
     </div>
 
-
     <!-- ═══ 持續運作 ═══ -->
     <div id="page-ops" class="page">
-      <div class="hero"><h2>🔄 持續運作績效查檢</h2><p>114年「疾病別照護品質持續運作績效查檢表」— 適用 113.01版 39項條文基準</p></div>
+      <div class="hero"><h2>🔄 每年持續運作績效查檢</h2><p>114年「疾病別照護品質持續運作績效查檢表」— 適用 113.01版 39項條文基準</p></div>
       <div class="ct">
         <div class="nc anim">
           <h3>📌 查檢表說明</h3>
